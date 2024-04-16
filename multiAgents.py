@@ -10,8 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
-
+from pacman import GameState
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -53,7 +52,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
-    def getAction(self, gameState):
+    def getAction(self, gameState: GameState):
+        action =
+        self.index
+        self.depth
+        gameState.isLose()
+        gameState.isWin()
+        gameState.getLegalActions()
         """
         Returns the minimax action from the current gameState using self.depth
         and self.evaluationFunction.
@@ -78,6 +83,30 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
+
+    def minimax(self, gameState: GameState, index):
+        numAgents = gameState.getNumAgents()
+        if index > self.depth * numAgents:
+            return self.evaluationFunction()
+
+        agentIndex = index % numAgents
+
+        if agentIndex == 0:
+            pass
+            #pacman -> Max
+            # bestValue = -inf
+            # for each child of node:
+            #     val = minimax(child, depth - 1, FALSE)
+            # bestValue = max(bestValue, val)
+            # return bestValue
+        else:
+            pass
+            # ghost -> Min
+            # bestValue = inf
+            # for each child of node:
+            #     val = minimax(child, depth - 1, TRUE)
+            # bestValue = min(bestValue, val)
+            # return bestValue
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
