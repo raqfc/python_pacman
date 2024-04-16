@@ -10,6 +10,8 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
+from math import inf
+
 from pacman import GameState
 from util import manhattanDistance
 from game import Directions
@@ -17,7 +19,8 @@ import random, util
 
 from game import Agent
 
-def scoreEvaluationFunction(currentGameState):
+
+def scoreEvaluationFunction(currentGameState: GameState):
     """
     This default evaluation function just returns the score of the state.
     The score is the same one displayed in the Pacman GUI.
@@ -25,7 +28,12 @@ def scoreEvaluationFunction(currentGameState):
     This evaluation function is meant for use with adversarial search agents
     (not reflex agents).
     """
+    # currentGameState.getFood() -> Aumentar valor da pos com proximidade
+    # currentGameState.getCapsules() -> Aumentar valor da pos com proximidade
+    # currentGameState.getGhostPositions() -> Diminuir valor da pos com proximidade
+
     return currentGameState.getScore()
+
 
 class MultiAgentSearchAgent(Agent):
     """
@@ -42,10 +50,11 @@ class MultiAgentSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
-        self.index = 0 # Pacman is always agent index 0
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+        self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -53,12 +62,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def getAction(self, gameState: GameState):
-        action =
-        self.index
-        self.depth
-        gameState.isLose()
-        gameState.isWin()
-        gameState.getLegalActions()
         """
         Returns the minimax action from the current gameState using self.depth
         and self.evaluationFunction.
@@ -87,26 +90,31 @@ class MinimaxAgent(MultiAgentSearchAgent):
     def minimax(self, gameState: GameState, index):
         numAgents = gameState.getNumAgents()
         if index > self.depth * numAgents:
-            return self.evaluationFunction()
+            return self.evaluationFunction(), None
 
         agentIndex = index % numAgents
 
         if agentIndex == 0:
-            pass
-            #pacman -> Max
-            # bestValue = -inf
-            # for each child of node:
-            #     val = minimax(child, depth - 1, FALSE)
-            # bestValue = max(bestValue, val)
-            # return bestValue
+            # pacman -> Max
+            bestValue = [-inf, None]
+            for action in gameState.getLegalActions(agentIndex):
+                nextState = gameState.generateSuccessor(agentIndex, action)
+
+                value, action = self.minimax(nextState, index + 1)
+                if value > bestValue[0]:
+                    bestValue = [value, action]
         else:
-            pass
             # ghost -> Min
-            # bestValue = inf
-            # for each child of node:
-            #     val = minimax(child, depth - 1, TRUE)
-            # bestValue = min(bestValue, val)
-            # return bestValue
+            bestValue = [inf, None]
+            for action in gameState.getLegalActions(agentIndex):
+                nextState = gameState.generateSuccessor(agentIndex, action)
+
+                value, action = self.minimax(nextState, index + 1)
+                if value < bestValue[0]:
+                    bestValue = [value, action]
+
+        return bestValue
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -119,6 +127,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -135,6 +144,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
+
 def betterEvaluationFunction(currentGameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
@@ -143,7 +153,8 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()    
+    util.raiseNotDefined()
+
 
 # Abbreviation
 better = betterEvaluationFunction
