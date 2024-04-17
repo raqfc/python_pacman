@@ -118,11 +118,44 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
 
     def getAction(self, gameState):
-        """
-        Returns the minimax action using self.depth and self.evaluationFunction
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        value, action = self.alphaBeta(gameState, -inf, inf, 0)
+        return action
+
+    def alphaBeta(self, gameState: GameState, alfa, beta, index):
+        numAgents = gameState.getNumAgents()
+        if index > self.depth * numAgents or shouldSelfEvaluate(gameState):
+            return self.evaluationFunction(gameState), None
+
+        agentIndex = index % numAgents
+
+        if agentIndex == 0:
+            # pacman -> Max
+            bestValue = [-inf, None]
+            for action in gameState.getLegalActions(agentIndex):
+                nextState = gameState.generateSuccessor(agentIndex, action)
+
+                value, childAction = self.alphaBeta(nextState, alfa, beta, index + 1)
+                if value >= bestValue[0]:
+                    bestValue = value, action
+                if value >= alfa:
+                    alfa = value
+                if beta < alfa:
+                    break
+        else:
+            # ghost -> Min
+            bestValue = [inf, None]
+            for action in gameState.getLegalActions(agentIndex):
+                nextState = gameState.generateSuccessor(agentIndex, action)
+
+                value, childAction = self.alphaBeta(nextState, alfa, beta, index + 1)
+                if value < bestValue[0]:
+                    bestValue = value, action
+                if value <= beta:
+                    beta = value
+                if beta < alfa:
+                    break
+
+        return bestValue
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
