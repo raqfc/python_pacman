@@ -10,6 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
+import random
 from math import inf
 
 import util
@@ -159,19 +160,37 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
-    """
-      Your expectimax agent (question 4)
-    """
 
-    def getAction(self, gameState):
-        """
-        Returns the expectimax action using self.depth and self.evaluationFunction
+    def getAction(self, gameState: GameState):
+        value, action = self.expectimax(gameState, 0)
+        return action
 
-        All ghosts should be modeled as choosing uniformly at random from their
-        legal moves.
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    def expectimax(self, gameState: GameState, index):
+        numAgents = gameState.getNumAgents()
+        if index > self.depth * numAgents or shouldSelfEvaluate(gameState):
+            return self.evaluationFunction(gameState), None
+
+        agentIndex = index % numAgents
+
+        if agentIndex == 0:
+            # pacman -> Max
+            bestValue = [-inf, None]
+            for action in gameState.getLegalActions(agentIndex):
+                nextState = gameState.generateSuccessor(agentIndex, action)
+
+                value, childAction = self.expectimax(nextState, index + 1)
+                if value >= bestValue[0]:
+                    bestValue = value, action
+            return bestValue
+        else:
+            # ghost -> Random
+            options = []
+            for action in gameState.getLegalActions(agentIndex):
+                nextState = gameState.generateSuccessor(agentIndex, action)
+
+                options.append((self.expectimax(nextState, index + 1)[0], action))
+
+            return random.choice(options)
 
 
 def betterEvaluationFunction(currentGameState):
