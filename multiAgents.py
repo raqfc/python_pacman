@@ -19,25 +19,8 @@ from pacman import GameState
 
 
 def scoreEvaluationFunction(currentGameState: GameState):
-    score = currentGameState.getScore()
-
-    pacmanPosition = currentGameState.getPacmanPosition()
-    ghostPositions = currentGameState.getGhostPositions()
-    capsulesPositions = currentGameState.getCapsules()
-    foodPositions = currentGameState.getFood()
-
-    if currentGameState.isLose():
-        return score - 1000
-    if currentGameState.isWin():
-        return score + 1000
-    elif currentGameState.getPacmanState().scaredTimer > 1 and pacmanPosition in ghostPositions:
-        return score + 200
-    elif pacmanPosition in capsulesPositions:
-        return score + 150
-    elif pacmanPosition in foodPositions:
-        return score + 150
-
-    return score
+    #return currentGameState.getScore()
+    return betterEvaluationFunction(currentGameState)
 
 
 def shouldSelfEvaluate(gameState: GameState):
@@ -194,14 +177,25 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
 
 def betterEvaluationFunction(currentGameState):
-    """
-    Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-    evaluation function (question 5).
+    score = currentGameState.getScore()
 
-    DESCRIPTION: <write something here so we know what you did>
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    pacmanPosition = currentGameState.getPacmanPosition()
+    ghostPositions = currentGameState.getGhostPositions()
+    capsulesPositions = currentGameState.getCapsules()
+    foodPositions = currentGameState.getFood()
+
+    if currentGameState.isLose():
+        return score - 1000
+    if currentGameState.isWin():
+        return score + 1000
+    elif currentGameState.getPacmanState().scaredTimer > 1 and pacmanPosition in ghostPositions:
+        return score + 100
+    elif pacmanPosition in capsulesPositions:
+        return score + 20
+    elif pacmanPosition in foodPositions:
+        return score + 10
+
+    return score - 1
 
 
 # Abbreviation
