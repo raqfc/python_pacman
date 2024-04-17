@@ -39,6 +39,20 @@ def scoreEvaluationFunction(currentGameState: GameState):
     return score
 
 
+def shouldSelfEvaluate(gameState: GameState):
+    pacmanPosition = gameState.getPacmanPosition()
+    ghostPositions = gameState.getGhostPositions()
+    capsulesPositions = gameState.getCapsules()
+    foodPositions = gameState.getFood()
+
+    return (gameState.isLose() or
+            gameState.isWin() or
+            ((gameState.getPacmanState().scaredTimer > 1) and (pacmanPosition in ghostPositions)) or
+            pacmanPosition in capsulesPositions or
+            pacmanPosition in foodPositions
+            )
+
+
 class MultiAgentSearchAgent(Agent):
     """
     This class provides some common elements to all of your
@@ -71,7 +85,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def minimax(self, gameState: GameState, index):
         numAgents = gameState.getNumAgents()
-        if index > self.depth * numAgents or gameState.isWin() or gameState.isLose():
+        if index > self.depth * numAgents or shouldSelfEvaluate(gameState):
             return self.evaluationFunction(gameState), None
 
         agentIndex = index % numAgents
@@ -83,7 +97,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 nextState = gameState.generateSuccessor(agentIndex, action)
 
                 value, childAction = self.minimax(nextState, index + 1)
-                if value > bestValue[0]:
+                if value >= bestValue[0]:
                     bestValue = value, action
         else:
             # ghost -> Min
