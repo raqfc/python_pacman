@@ -30,11 +30,11 @@ def scoreEvaluationFunction(currentGameState: GameState):
     if currentGameState.isWin():
         return score + 1000
     elif currentGameState.getPacmanState().scaredTimer > 1 and pacmanPosition in ghostPositions:
-        return score + 150
+        return score + 200
     elif pacmanPosition in capsulesPositions:
-        return score + 100
+        return score + 150
     elif pacmanPosition in foodPositions:
-        return score + 100
+        return score + 150
 
     return score
 
