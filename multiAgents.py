@@ -12,27 +12,31 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 from math import inf
 
-from pacman import GameState
-from util import manhattanDistance
-from game import Directions
-import random, util
-
+import util
 from game import Agent
+from pacman import GameState
 
 
 def scoreEvaluationFunction(currentGameState: GameState):
-    """
-    This default evaluation function just returns the score of the state.
-    The score is the same one displayed in the Pacman GUI.
+    score = currentGameState.getScore()
 
-    This evaluation function is meant for use with adversarial search agents
-    (not reflex agents).
-    """
-    # currentGameState.getFood() -> Aumentar valor da pos com proximidade
-    # currentGameState.getCapsules() -> Aumentar valor da pos com proximidade
-    # currentGameState.getGhostPositions() -> Diminuir valor da pos com proximidade
+    pacmanPosition = currentGameState.getPacmanPosition()
+    ghostPositions = currentGameState.getGhostPositions()
+    capsulesPositions = currentGameState.getCapsules()
+    foodPositions = currentGameState.getFood()
 
-    return currentGameState.getScore()
+    if currentGameState.isLose():
+        return score - 1000
+    if currentGameState.isWin():
+        return score + 1000
+    elif currentGameState.getPacmanState().scaredTimer > 1 and pacmanPosition in ghostPositions:
+        return score + 150
+    elif pacmanPosition in capsulesPositions:
+        return score + 100
+    elif pacmanPosition in foodPositions:
+        return score + 100
+
+    return score
 
 
 class MultiAgentSearchAgent(Agent):
@@ -62,35 +66,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def getAction(self, gameState: GameState):
-        """
-        Returns the minimax action from the current gameState using self.depth
-        and self.evaluationFunction.
-
-        Here are some method calls that might be useful when implementing minimax.
-
-        gameState.getLegalActions(agentIndex):
-        Returns a list of legal actions for an agent
-        agentIndex=0 means Pacman, ghosts are >= 1
-
-        gameState.generateSuccessor(agentIndex, action):
-        Returns the child game state after an agent takes an action
-
-        gameState.getNumAgents():
-        Returns the total number of agents in the game
-
-        gameState.isWin():
-        Returns whether or not the game state is a winning state
-
-        gameState.isLose():
-        Returns whether or not the game state is a losing state
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        value, action = self.minimax(gameState, 0)
+        return action
 
     def minimax(self, gameState: GameState, index):
         numAgents = gameState.getNumAgents()
-        if index > self.depth * numAgents:
-            return self.evaluationFunction(), None
+        if index > self.depth * numAgents or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState), None
 
         agentIndex = index % numAgents
 
@@ -100,18 +82,18 @@ class MinimaxAgent(MultiAgentSearchAgent):
             for action in gameState.getLegalActions(agentIndex):
                 nextState = gameState.generateSuccessor(agentIndex, action)
 
-                value, action = self.minimax(nextState, index + 1)
+                value, childAction = self.minimax(nextState, index + 1)
                 if value > bestValue[0]:
-                    bestValue = [value, action]
+                    bestValue = value, action
         else:
             # ghost -> Min
             bestValue = [inf, None]
             for action in gameState.getLegalActions(agentIndex):
                 nextState = gameState.generateSuccessor(agentIndex, action)
 
-                value, action = self.minimax(nextState, index + 1)
+                value, childAction = self.minimax(nextState, index + 1)
                 if value < bestValue[0]:
-                    bestValue = [value, action]
+                    bestValue = value, action
 
         return bestValue
 
